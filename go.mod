@@ -1,4 +1,4 @@
-module github.com/hashicorp/terraform-registry-address
+module github.com/opentf-fonudation/registry-address
 
 go 1.19
 

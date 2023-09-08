@@ -22,7 +22,7 @@ func TestParseModuleSource_simple(t *testing.T) {
 			input: "hashicorp/subnets/cidr",
 			want: Module{
 				Package: ModulePackage{
-					Host:         svchost.Hostname("registry.terraform.io"),
+					Host:         svchost.Hostname("registry.opentf.org"),
 					Namespace:    "hashicorp",
 					Name:         "subnets",
 					TargetSystem: "cidr",
@@ -34,7 +34,7 @@ func TestParseModuleSource_simple(t *testing.T) {
 			input: "hashicorp/subnets/cidr//examples/foo",
 			want: Module{
 				Package: ModulePackage{
-					Host:         svchost.Hostname("registry.terraform.io"),
+					Host:         svchost.Hostname("registry.opentf.org"),
 					Namespace:    "hashicorp",
 					Name:         "subnets",
 					TargetSystem: "cidr",
@@ -104,25 +104,25 @@ func TestParseModuleSource(t *testing.T) {
 	}{
 		"public registry": {
 			input:           `hashicorp/consul/aws`,
-			wantString:      `registry.terraform.io/hashicorp/consul/aws`,
+			wantString:      `registry.opentf.org/hashicorp/consul/aws`,
 			wantForDisplay:  `hashicorp/consul/aws`,
 			wantForProtocol: `hashicorp/consul/aws`,
 		},
 		"public registry with subdir": {
 			input:           `hashicorp/consul/aws//foo`,
-			wantString:      `registry.terraform.io/hashicorp/consul/aws//foo`,
+			wantString:      `registry.opentf.org/hashicorp/consul/aws//foo`,
 			wantForDisplay:  `hashicorp/consul/aws//foo`,
 			wantForProtocol: `hashicorp/consul/aws`,
 		},
 		"public registry using explicit hostname": {
-			input:           `registry.terraform.io/hashicorp/consul/aws`,
-			wantString:      `registry.terraform.io/hashicorp/consul/aws`,
+			input:           `registry.opentf.org/hashicorp/consul/aws`,
+			wantString:      `registry.opentf.org/hashicorp/consul/aws`,
 			wantForDisplay:  `hashicorp/consul/aws`,
 			wantForProtocol: `hashicorp/consul/aws`,
 		},
 		"public registry with mixed case names": {
 			input:           `HashiCorp/Consul/aws`,
-			wantString:      `registry.terraform.io/HashiCorp/Consul/aws`,
+			wantString:      `registry.opentf.org/HashiCorp/Consul/aws`,
 			wantForDisplay:  `HashiCorp/Consul/aws`,
 			wantForProtocol: `HashiCorp/Consul/aws`,
 		},
@@ -249,5 +249,5 @@ func ExampleParseModuleSource() {
 		log.Fatal(err)
 	}
 	fmt.Printf("%#v", mAddr)
-	// Output: tfaddr.Module{Package:tfaddr.ModulePackage{Host:svchost.Hostname("registry.terraform.io"), Namespace:"hashicorp", Name:"consul", TargetSystem:"aws"}, Subdir:"modules/consul-cluster"}
+	// Output: tfaddr.Module{Package:tfaddr.ModulePackage{Host:svchost.Hostname("registry.opentf.org"), Namespace:"hashicorp", Name:"consul", TargetSystem:"aws"}, Subdir:"modules/consul-cluster"}
 }

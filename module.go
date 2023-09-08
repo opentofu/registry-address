@@ -34,7 +34,7 @@ type Module struct {
 
 // DefaultModuleRegistryHost is the hostname used for registry-based module
 // source addresses that do not have an explicit hostname.
-const DefaultModuleRegistryHost = svchost.Hostname("registry.terraform.io")
+const DefaultModuleRegistryHost = svchost.Hostname("registry.opentf.org")
 
 var moduleRegistryNamePattern = regexp.MustCompile("^[0-9A-Za-z](?:[0-9A-Za-z-_]{0,62}[0-9A-Za-z])?$")
 var moduleRegistryTargetSystemPattern = regexp.MustCompile("^[0-9a-z]{1,64}$")
@@ -115,7 +115,7 @@ func ParseModuleSource(raw string) (Module, error) {
 
 // MustParseModuleSource is a wrapper around ParseModuleSource that panics if
 // it returns an error.
-func MustParseModuleSource(raw string) (Module) {
+func MustParseModuleSource(raw string) Module {
 	mod, err := ParseModuleSource(raw)
 	if err != nil {
 		panic(err)
@@ -215,9 +215,10 @@ func splitPackageSubdir(given string) (packageAddr, subDir string) {
 // the subdir and the subdir.
 //
 // ex:
-//   dom.com/path/?q=p               => dom.com/path/?q=p, ""
-//   proto://dom.com/path//*?q=p     => proto://dom.com/path?q=p, "*"
-//   proto://dom.com/path//path2?q=p => proto://dom.com/path?q=p, "path2"
+//
+//	dom.com/path/?q=p               => dom.com/path/?q=p, ""
+//	proto://dom.com/path//*?q=p     => proto://dom.com/path?q=p, "*"
+//	proto://dom.com/path//path2?q=p => proto://dom.com/path?q=p, "path2"
 func sourceDirSubdir(src string) (string, string) {
 	// URL might contains another url in query parameters
 	stop := len(src)

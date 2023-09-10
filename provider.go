@@ -26,7 +26,7 @@ const DefaultProviderRegistryHost = svchost.Hostname("registry.opentf.org")
 // BuiltInProviderHost is the pseudo-hostname used for the "built-in" provider
 // namespace. Built-in provider addresses must also have their namespace set
 // to BuiltInProviderNamespace in order to be considered as built-in.
-const BuiltInProviderHost = svchost.Hostname("opentf.org")
+const BuiltInProviderHost = svchost.Hostname("terraform.io")
 
 // BuiltInProviderNamespace is the provider namespace used for "built-in"
 // providers. Built-in provider addresses must also have their hostname
@@ -135,8 +135,8 @@ func (pt Provider) HasKnownNamespace() bool {
 }
 
 // IsBuiltIn returns true if the receiver is the address of a "built-in"
-// provider. That is, a provider under <BuiltInProviderHost>/<BuiltInProviderNamespace>/ (ie opentf.org/builtin)
-// which is  included as part of the core binary itself rather than one to be
+// provider. That is, a provider under terraform.io/builtin/
+// which is included as part of the core binary itself rather than one to be
 // installed from elsewhere.
 //
 // These are ignored by the provider installer because they are assumed to

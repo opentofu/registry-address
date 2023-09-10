@@ -121,11 +121,11 @@ func TestProviderDisplay(t *testing.T) {
 		},
 		{
 			Provider{
-				Type:      "opentf",
+				Type:      "terraform",
 				Namespace: BuiltInProviderNamespace,
 				Hostname:  BuiltInProviderHost,
 			},
-			"opentf.org/builtin/opentf",
+			"terraform.io/builtin/terraform",
 		},
 	}
 
@@ -277,9 +277,9 @@ func TestParseProviderSource(t *testing.T) {
 			},
 			false,
 		},
-		"opentf.org/builtin/opentf": {
+		"terraform.io/builtin/terraform": {
 			Provider{
-				Type:      "opentf",
+				Type:      "terraform",
 				Namespace: BuiltInProviderNamespace,
 				Hostname:  BuiltInProviderHost,
 			},
@@ -289,9 +289,9 @@ func TestParseProviderSource(t *testing.T) {
 		// In most cases this would *likely* be the same provider
 		// we otherwise represent as builtin, but we cannot be sure
 		// in the context of the source string alone.
-		"opentf": {
+		"terraform": {
 			Provider{
-				Type:      "opentf",
+				Type:      "terraform",
 				Namespace: UnknownProviderNamespace,
 				Hostname:  DefaultProviderRegistryHost,
 			},

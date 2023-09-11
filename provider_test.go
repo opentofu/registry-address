@@ -36,10 +36,10 @@ func TestProviderString(t *testing.T) {
 		{
 			Provider{
 				Type:      "test",
-				Hostname:  "registry.terraform.com",
+				Hostname:  "registry.opentf.com",
 				Namespace: "hashicorp",
 			},
-			"registry.terraform.com/hashicorp/test",
+			"registry.opentf.com/hashicorp/test",
 		},
 		{
 			Provider{
@@ -74,11 +74,11 @@ func TestProviderLegacyString(t *testing.T) {
 		},
 		{
 			Provider{
-				Type:      "terraform",
+				Type:      "opentf",
 				Hostname:  BuiltInProviderHost,
 				Namespace: BuiltInProviderNamespace,
 			},
-			"terraform",
+			"opentf",
 		},
 	}
 
@@ -106,10 +106,10 @@ func TestProviderDisplay(t *testing.T) {
 		{
 			Provider{
 				Type:      "test",
-				Hostname:  "registry.terraform.com",
+				Hostname:  "registry.opentf.com",
 				Namespace: "hashicorp",
 			},
-			"registry.terraform.com/hashicorp/test",
+			"registry.opentf.com/hashicorp/test",
 		},
 		{
 			Provider{
@@ -152,7 +152,7 @@ func TestProviderIsBuiltIn(t *testing.T) {
 		},
 		{
 			Provider{
-				Type:      "terraform",
+				Type:      "opentf",
 				Hostname:  BuiltInProviderHost,
 				Namespace: BuiltInProviderNamespace,
 			},
@@ -185,7 +185,7 @@ func TestProviderIsBuiltIn(t *testing.T) {
 		{
 			Provider{
 				Type:      "test",
-				Hostname:  "registry.terraform.com",
+				Hostname:  "registry.opentf.com",
 				Namespace: "hashicorp",
 			},
 			false,
@@ -224,7 +224,7 @@ func TestProviderIsLegacy(t *testing.T) {
 		{
 			Provider{
 				Type:      "test",
-				Hostname:  "registry.terraform.com",
+				Hostname:  "registry.opentf.com",
 				Namespace: LegacyProviderNamespace,
 			},
 			false,
@@ -253,7 +253,7 @@ func ExampleParseProviderSource() {
 		log.Fatal(err)
 	}
 	fmt.Printf("%#v", pAddr)
-	// Output: tfaddr.Provider{Type:"aws", Namespace:"hashicorp", Hostname:svchost.Hostname("registry.terraform.io")}
+	// Output: tfaddr.Provider{Type:"aws", Namespace:"hashicorp", Hostname:svchost.Hostname("registry.opentf.org")}
 }
 
 func TestParseProviderSource(t *testing.T) {
@@ -261,7 +261,7 @@ func TestParseProviderSource(t *testing.T) {
 		Want Provider
 		Err  bool
 	}{
-		"registry.terraform.io/hashicorp/aws": {
+		"registry.opentf.org/hashicorp/aws": {
 			Provider{
 				Type:      "aws",
 				Namespace: "hashicorp",
@@ -269,7 +269,7 @@ func TestParseProviderSource(t *testing.T) {
 			},
 			false,
 		},
-		"registry.Terraform.io/HashiCorp/AWS": {
+		"registry.Opentf.org/HashiCorp/AWS": {
 			Provider{
 				Type:      "aws",
 				Namespace: "hashicorp",
@@ -286,7 +286,7 @@ func TestParseProviderSource(t *testing.T) {
 			false,
 		},
 		// v0.12 representation
-		// In most cases this would *likely* be the same 'terraform' provider
+		// In most cases this would *likely* be the same provider
 		// we otherwise represent as builtin, but we cannot be sure
 		// in the context of the source string alone.
 		"terraform": {
@@ -415,15 +415,15 @@ func TestParseProviderSource(t *testing.T) {
 		},
 
 		// We forbid the terraform- prefix both because it's redundant to
-		// include "terraform" in a Terraform provider name and because we use
+		// include "terraform" in a provider name and because we use
 		// the longer prefix terraform-provider- to hint for users who might be
 		// accidentally using the git repository name or executable file name
 		// instead of the provider type.
-		"example.com/hashicorp/terraform-provider-bad": {
+		"example.com/opentffoundation/terraform-provider-bad": {
 			Provider{},
 			true,
 		},
-		"example.com/hashicorp/terraform-bad": {
+		"example.com/opentffoundation/terraform-bad": {
 			Provider{},
 			true,
 		},

@@ -21,7 +21,7 @@ type Provider struct {
 
 // DefaultProviderRegistryHost is the hostname used for provider addresses that do
 // not have an explicit hostname.
-const DefaultProviderRegistryHost = svchost.Hostname("registry.terraform.io")
+const DefaultProviderRegistryHost = svchost.Hostname("registry.opentf.org")
 
 // BuiltInProviderHost is the pseudo-hostname used for the "built-in" provider
 // namespace. Built-in provider addresses must also have their namespace set
@@ -135,8 +135,8 @@ func (pt Provider) HasKnownNamespace() bool {
 }
 
 // IsBuiltIn returns true if the receiver is the address of a "built-in"
-// provider. That is, a provider under terraform.io/builtin/ which is
-// included as part of the Terraform binary itself rather than one to be
+// provider. That is, a provider under terraform.io/builtin/
+// which is included as part of the core binary itself rather than one to be
 // installed from elsewhere.
 //
 // These are ignored by the provider installer because they are assumed to
@@ -150,7 +150,7 @@ func (pt Provider) IsBuiltIn() bool {
 //
 // This ordering is an arbitrary one just to allow deterministic results from
 // functions that would otherwise have no natural ordering. It's subject
-// to change in future.
+// to change in the future.
 func (pt Provider) LessThan(other Provider) bool {
 	switch {
 	case pt.Hostname != other.Hostname:
@@ -182,9 +182,10 @@ func (pt Provider) Equals(other Provider) bool {
 // terraform-config-inspect.
 //
 // The following are valid source string formats:
-// 		name
-// 		namespace/name
-// 		hostname/namespace/name
+//
+//	name
+//	namespace/name
+//	hostname/namespace/name
 //
 // "name"-only format is parsed as -/name (i.e. legacy namespace)
 // requiring further identification of the namespace via Registry API
@@ -296,7 +297,7 @@ func ParseProviderSource(str string) (Provider, error) {
 
 // MustParseProviderSource is a wrapper around ParseProviderSource that panics if
 // it returns an error.
-func MustParseProviderSource(raw string) (Provider) {
+func MustParseProviderSource(raw string) Provider {
 	p, err := ParseProviderSource(raw)
 	if err != nil {
 		panic(err)

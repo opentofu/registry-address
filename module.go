@@ -34,7 +34,7 @@ type Module struct {
 
 // DefaultModuleRegistryHost is the hostname used for registry-based module
 // source addresses that do not have an explicit hostname.
-const DefaultModuleRegistryHost = svchost.Hostname("registry.opentf.org")
+const DefaultModuleRegistryHost = svchost.Hostname("registry.opentofu.org")
 
 var moduleRegistryNamePattern = regexp.MustCompile("^[0-9A-Za-z](?:[0-9A-Za-z-_]{0,62}[0-9A-Za-z])?$")
 var moduleRegistryTargetSystemPattern = regexp.MustCompile("^[0-9a-z]{1,64}$")

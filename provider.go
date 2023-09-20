@@ -21,7 +21,7 @@ type Provider struct {
 
 // DefaultProviderRegistryHost is the hostname used for provider addresses that do
 // not have an explicit hostname.
-const DefaultProviderRegistryHost = svchost.Hostname("registry.opentf.org")
+const DefaultProviderRegistryHost = svchost.Hostname("registry.opentofu.org")
 
 // BuiltInProviderHost is the pseudo-hostname used for the "built-in" provider
 // namespace. Built-in provider addresses must also have their namespace set

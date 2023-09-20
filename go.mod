@@ -1,4 +1,4 @@
-module github.com/opentffoundation/registry-address
+module github.com/opentofu/registry-address
 
 go 1.19
 

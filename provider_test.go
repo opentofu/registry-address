@@ -36,10 +36,10 @@ func TestProviderString(t *testing.T) {
 		{
 			Provider{
 				Type:      "test",
-				Hostname:  "registry.opentf.com",
+				Hostname:  "registry.opentofu.com",
 				Namespace: "hashicorp",
 			},
-			"registry.opentf.com/hashicorp/test",
+			"registry.opentofu.com/hashicorp/test",
 		},
 		{
 			Provider{
@@ -106,10 +106,10 @@ func TestProviderDisplay(t *testing.T) {
 		{
 			Provider{
 				Type:      "test",
-				Hostname:  "registry.opentf.com",
+				Hostname:  "registry.opentofu.com",
 				Namespace: "hashicorp",
 			},
-			"registry.opentf.com/hashicorp/test",
+			"registry.opentofu.com/hashicorp/test",
 		},
 		{
 			Provider{
@@ -185,7 +185,7 @@ func TestProviderIsBuiltIn(t *testing.T) {
 		{
 			Provider{
 				Type:      "test",
-				Hostname:  "registry.opentf.com",
+				Hostname:  "registry.opentofu.com",
 				Namespace: "hashicorp",
 			},
 			false,
@@ -224,7 +224,7 @@ func TestProviderIsLegacy(t *testing.T) {
 		{
 			Provider{
 				Type:      "test",
-				Hostname:  "registry.opentf.com",
+				Hostname:  "registry.opentofu.com",
 				Namespace: LegacyProviderNamespace,
 			},
 			false,
@@ -253,7 +253,7 @@ func ExampleParseProviderSource() {
 		log.Fatal(err)
 	}
 	fmt.Printf("%#v", pAddr)
-	// Output: tfaddr.Provider{Type:"aws", Namespace:"hashicorp", Hostname:svchost.Hostname("registry.opentf.org")}
+	// Output: tfaddr.Provider{Type:"aws", Namespace:"hashicorp", Hostname:svchost.Hostname("registry.opentofu.org")}
 }
 
 func TestParseProviderSource(t *testing.T) {
@@ -261,7 +261,7 @@ func TestParseProviderSource(t *testing.T) {
 		Want Provider
 		Err  bool
 	}{
-		"registry.opentf.org/hashicorp/aws": {
+		"registry.opentofu.org/hashicorp/aws": {
 			Provider{
 				Type:      "aws",
 				Namespace: "hashicorp",
@@ -269,7 +269,7 @@ func TestParseProviderSource(t *testing.T) {
 			},
 			false,
 		},
-		"registry.Opentf.org/HashiCorp/AWS": {
+		"registry.opentofu.org/HashiCorp/AWS": {
 			Provider{
 				Type:      "aws",
 				Namespace: "hashicorp",
@@ -419,11 +419,11 @@ func TestParseProviderSource(t *testing.T) {
 		// the longer prefix terraform-provider- to hint for users who might be
 		// accidentally using the git repository name or executable file name
 		// instead of the provider type.
-		"example.com/opentffoundation/terraform-provider-bad": {
+		"example.com/opentofu/terraform-provider-bad": {
 			Provider{},
 			true,
 		},
-		"example.com/opentffoundation/terraform-bad": {
+		"example.com/opentofu/terraform-bad": {
 			Provider{},
 			true,
 		},

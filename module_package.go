@@ -1,12 +1,13 @@
+// Copyright (c) The OpenTofu Authors
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
-package tfaddr
+package regaddr
 
 import (
 	"strings"
 
-	svchost "github.com/hashicorp/terraform-svchost"
+	"github.com/opentofu/svchost"
 )
 
 // A ModulePackage is an extra indirection over a ModulePackage where

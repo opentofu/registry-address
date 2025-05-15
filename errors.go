@@ -1,7 +1,8 @@
+// Copyright (c) The OpenTofu Authors
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
-package tfaddr
+package regaddr
 
 import (
 	"fmt"

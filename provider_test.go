@@ -1,7 +1,8 @@
+// Copyright (c) The OpenTofu Authors
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
-package tfaddr
+package regaddr
 
 import (
 	"fmt"
@@ -9,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	svchost "github.com/hashicorp/terraform-svchost"
+	"github.com/opentofu/svchost"
 )
 
 func TestProviderString(t *testing.T) {
@@ -75,7 +76,7 @@ func TestProviderLegacyString(t *testing.T) {
 		{
 			Provider{
 				Type:      "opentf",
-				Hostname:  BuiltInProviderHost,
+				Hostname:  TransitionalBuiltInProviderHost,
 				Namespace: BuiltInProviderNamespace,
 			},
 			"opentf",
@@ -123,7 +124,7 @@ func TestProviderDisplay(t *testing.T) {
 			Provider{
 				Type:      "terraform",
 				Namespace: BuiltInProviderNamespace,
-				Hostname:  BuiltInProviderHost,
+				Hostname:  TransitionalBuiltInProviderHost,
 			},
 			"terraform.io/builtin/terraform",
 		},
@@ -145,7 +146,7 @@ func TestProviderIsBuiltIn(t *testing.T) {
 		{
 			Provider{
 				Type:      "test",
-				Hostname:  BuiltInProviderHost,
+				Hostname:  TransitionalBuiltInProviderHost,
 				Namespace: BuiltInProviderNamespace,
 			},
 			true,
@@ -153,7 +154,7 @@ func TestProviderIsBuiltIn(t *testing.T) {
 		{
 			Provider{
 				Type:      "opentf",
-				Hostname:  BuiltInProviderHost,
+				Hostname:  TransitionalBuiltInProviderHost,
 				Namespace: BuiltInProviderNamespace,
 			},
 			true,
@@ -161,7 +162,7 @@ func TestProviderIsBuiltIn(t *testing.T) {
 		{
 			Provider{
 				Type:      "test",
-				Hostname:  BuiltInProviderHost,
+				Hostname:  TransitionalBuiltInProviderHost,
 				Namespace: "boop",
 			},
 			false,
@@ -253,7 +254,7 @@ func ExampleParseProviderSource() {
 		log.Fatal(err)
 	}
 	fmt.Printf("%#v", pAddr)
-	// Output: tfaddr.Provider{Type:"aws", Namespace:"hashicorp", Hostname:svchost.Hostname("registry.opentofu.org")}
+	// Output: regaddr.Provider{Type:"aws", Namespace:"hashicorp", Hostname:svchost.Hostname("registry.opentofu.org")}
 }
 
 func TestParseProviderSource(t *testing.T) {
@@ -277,18 +278,26 @@ func TestParseProviderSource(t *testing.T) {
 			},
 			false,
 		},
-		"terraform.io/builtin/terraform": {
+		"opentofu.org/builtin/opentofu": {
 			Provider{
-				Type:      "terraform",
+				Type:      "opentofu",
 				Namespace: BuiltInProviderNamespace,
 				Hostname:  BuiltInProviderHost,
 			},
 			false,
 		},
+		"terraform.io/builtin/terraform": {
+			Provider{
+				Type:      "terraform",
+				Namespace: BuiltInProviderNamespace,
+				Hostname:  TransitionalBuiltInProviderHost,
+			},
+			false,
+		},
 		// v0.12 representation
 		// In most cases this would *likely* be the same provider
-		// we otherwise represent as builtin, but we cannot be sure
-		// in the context of the source string alone.
+		// we otherwise represent as being in the default namespace,
+		// but we cannot be sure in the context of the source string alone.
 		"terraform": {
 			Provider{
 				Type:      "terraform",
@@ -414,11 +423,21 @@ func TestParseProviderSource(t *testing.T) {
 			true,
 		},
 
-		// We forbid the terraform- prefix both because it's redundant to
-		// include "terraform" in a provider name and because we use
-		// the longer prefix terraform-provider- to hint for users who might be
+		// We forbid the opentofu- prefix both because it's redundant to
+		// include "opentofu" in a provider name and because we use
+		// the longer prefix opentofu-provider- to hint for users who might be
 		// accidentally using the git repository name or executable file name
-		// instead of the provider type.
+		// instead of the provider type. We also continue our predecessor
+		// project's tradition of forbidding similar prefixes for its own
+		// project name.
+		"example.com/opentofu/opentofu-provider-bad": {
+			Provider{},
+			true,
+		},
+		"example.com/opentofu/opentofu-bad": {
+			Provider{},
+			true,
+		},
 		"example.com/opentofu/terraform-provider-bad": {
 			Provider{},
 			true,
@@ -560,8 +579,4 @@ func TestProviderEquals(t *testing.T) {
 			}
 		})
 	}
-}
-
-func TestValidateProviderAddress(t *testing.T) {
-	t.Skip("TODO")
 }

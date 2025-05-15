@@ -1,13 +1,14 @@
+// Copyright (c) The OpenTofu Authors
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
-package tfaddr
+package regaddr
 
 import (
 	"fmt"
 	"strings"
 
-	svchost "github.com/hashicorp/terraform-svchost"
+	"github.com/opentofu/svchost"
 	"golang.org/x/net/idna"
 )
 
@@ -23,10 +24,29 @@ type Provider struct {
 // not have an explicit hostname.
 const DefaultProviderRegistryHost = svchost.Hostname("registry.opentofu.org")
 
-// BuiltInProviderHost is the pseudo-hostname used for the "built-in" provider
-// namespace. Built-in provider addresses must also have their namespace set
+// TransitionalDefaultProviderRegistryHost is the default registry hostname used
+// by OpenTofu's predecessor.
+//
+// Addresses with this hostname are not typically used directly with OpenTofu,
+// but OpenTofu contains some support code to help with automatically migrating
+// certain uses of this hostname to use [DefaultProviderRegistryHost] instead.
+const TransitionalDefaultProviderRegistryHost = svchost.Hostname("registry.terraform.io")
+
+// BuiltInProviderHost is a hostname currently reserved for potential future
+// use to represent built-in providers that are OpenTofu-specific, rather
+// than inherited from OpenTofu's predecessor.
+//
+// To determine whether a particular provider address should be treated as
+// built-in, prefer to use [Provider.IsBuiltIn] instead of directly comparing
+// to this value, because [TransitionalBuiltInProviderHost] is also a valid
+// hostname for certain built-in providers.
+const BuiltInProviderHost = svchost.Hostname("opentofu.org")
+
+// TransitionalBuiltInProviderHost is a hostname used for the namespace of
+// "built-in" providers inherited from OpenTofu's predecessor.
+// Built-in provider addresses must also have their namespace set
 // to BuiltInProviderNamespace in order to be considered as built-in.
-const BuiltInProviderHost = svchost.Hostname("terraform.io")
+const TransitionalBuiltInProviderHost = svchost.Hostname("terraform.io")
 
 // BuiltInProviderNamespace is the provider namespace used for "built-in"
 // providers. Built-in provider addresses must also have their hostname
@@ -40,15 +60,16 @@ const BuiltInProviderNamespace = "builtin"
 // UnknownProviderNamespace is the special string used to indicate
 // unknown namespace, e.g. in "aws". This is equivalent to
 // LegacyProviderNamespace for <0.12 style address. This namespace
-// would never be produced by Terraform itself explicitly, it is
+// would never be produced by OpenTofu itself explicitly, since it is
 // only an internal placeholder.
 const UnknownProviderNamespace = "?"
 
 // LegacyProviderNamespace is the special string used in the Namespace field
 // of type Provider to mark a legacy provider address. This special namespace
 // value would normally be invalid, and can be used only when the hostname is
-// DefaultProviderRegistryHost because that host owns the mapping from legacy name to
-// FQN. This may be produced by Terraform 0.13.
+// DefaultProviderRegistryHost because that host owns the mapping from legacy
+// name to FQN. This is produced only by historical versions of OpenTofu's
+// predecessor.
 const LegacyProviderNamespace = "-"
 
 // String returns an FQN string, indended for use in machine-readable output.
@@ -135,14 +156,13 @@ func (pt Provider) HasKnownNamespace() bool {
 }
 
 // IsBuiltIn returns true if the receiver is the address of a "built-in"
-// provider. That is, a provider under terraform.io/builtin/
-// which is included as part of the core binary itself rather than one to be
-// installed from elsewhere.
+// provider. That is, a provider under that is included as part of the OpenTofu
+// CLI executable itself rather than one to be installed from elsewhere.
 //
-// These are ignored by the provider installer because they are assumed to
-// already be available without any further installation.
+// These are ignored by the OpenTofu provider installer because they are assumed
+// to already be available without any further installation.
 func (pt Provider) IsBuiltIn() bool {
-	return pt.Hostname == BuiltInProviderHost && pt.Namespace == BuiltInProviderNamespace
+	return (pt.Hostname == TransitionalBuiltInProviderHost || pt.Hostname == BuiltInProviderHost) && pt.Namespace == BuiltInProviderNamespace
 }
 
 // LessThan returns true if the receiver should sort before the other given
@@ -178,8 +198,6 @@ func (pt Provider) Equals(other Provider) bool {
 }
 
 // ParseProviderSource parses the source attribute and returns a provider.
-// This is intended primarily to parse the FQN-like strings returned by
-// terraform-config-inspect.
 //
 // The following are valid source string formats:
 //
@@ -260,10 +278,12 @@ func ParseProviderSource(str string) (Provider, error) {
 	// to provider developers about the terraform- prefix being redundant
 	// and give specialized feedback to folks who incorrectly use the full
 	// terraform-provider- prefix to help them self-correct.
-	const redundantPrefix = "terraform-"
-	const userErrorPrefix = "terraform-provider-"
-	if strings.HasPrefix(ret.Type, redundantPrefix) {
-		if strings.HasPrefix(ret.Type, userErrorPrefix) {
+	const redundantPrefix = "opentofu-"
+	const userErrorPrefix = "opentofu-provider-"
+	const transitionalRedundantPrefix = "terraform-"
+	const transitionalUserErrorPrefix = "terraform-provider-"
+	if strings.HasPrefix(ret.Type, transitionalRedundantPrefix) {
+		if strings.HasPrefix(ret.Type, transitionalUserErrorPrefix) {
 			// Likely user error. We only return this specialized error if
 			// whatever is after the prefix would otherwise be a
 			// syntactically-valid provider type, so we don't end up advising
@@ -272,13 +292,13 @@ func ParseProviderSource(str string) (Provider, error) {
 			// (This is mainly just for robustness, because the validation
 			// we already did above should've rejected most/all ways for
 			// the suggestedType to end up invalid here.)
-			suggestedType := ret.Type[len(userErrorPrefix):]
+			suggestedType := ret.Type[len(transitionalUserErrorPrefix):]
 			if _, err := ParseProviderPart(suggestedType); err == nil {
 				suggestedAddr := ret
 				suggestedAddr.Type = suggestedType
 				return Provider{}, &ParserError{
 					Summary: "Invalid provider type",
-					Detail:  fmt.Sprintf("Provider source %q has a type with the prefix %q, which isn't valid. Although that prefix is often used in the names of version control repositories for Terraform providers, provider source strings should not include it.\n\nDid you mean %q?", ret.ForDisplay(), userErrorPrefix, suggestedAddr.ForDisplay()),
+					Detail:  fmt.Sprintf("Provider source %q has a type with the prefix %q, which isn't valid. Although that prefix is often used in the names of version control repositories for Terraform providers, provider source strings should not include it.\n\nDid you mean %q?", ret.ForDisplay(), transitionalUserErrorPrefix, suggestedAddr.ForDisplay()),
 				}
 			}
 		}
@@ -288,7 +308,25 @@ func ParseProviderSource(str string) (Provider, error) {
 		// names.
 		return Provider{}, &ParserError{
 			Summary: "Invalid provider type",
-			Detail:  fmt.Sprintf("Provider source %q has a type with the prefix %q, which isn't allowed because it would be redundant to name a Terraform provider with that prefix. If you are the author of this provider, rename it to not include the prefix.", ret, redundantPrefix),
+			Detail:  fmt.Sprintf("Provider source %q has a type with the prefix %q, which isn't allowed because it would be redundant to name a Terraform provider with that prefix. If you are the author of this provider, rename it to not include the prefix.", ret, transitionalRedundantPrefix),
+		}
+	} else if strings.HasPrefix(ret.Type, redundantPrefix) {
+		// This is the same as above but for the OpenTofu-flavored versions
+		// of these names.
+		if strings.HasPrefix(ret.Type, userErrorPrefix) {
+			suggestedType := ret.Type[len(userErrorPrefix):]
+			if _, err := ParseProviderPart(suggestedType); err == nil {
+				suggestedAddr := ret
+				suggestedAddr.Type = suggestedType
+				return Provider{}, &ParserError{
+					Summary: "Invalid provider type",
+					Detail:  fmt.Sprintf("Provider source %q has a type with the prefix %q, which isn't valid. Although that prefix is sometimes used in the names of version control repositories for OpenTofu providers, provider source strings should not include it.\n\nDid you mean %q?", ret.ForDisplay(), userErrorPrefix, suggestedAddr.ForDisplay()),
+				}
+			}
+		}
+		return Provider{}, &ParserError{
+			Summary: "Invalid provider type",
+			Detail:  fmt.Sprintf("Provider source %q has a type with the prefix %q, which isn't allowed because it would be redundant to name an OpenTofu provider with that prefix. If you are the author of this provider, rename it to not include the prefix.", ret, redundantPrefix),
 		}
 	}
 

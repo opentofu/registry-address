@@ -1,7 +1,8 @@
+// Copyright (c) The OpenTofu Authors
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
-package tfaddr
+package regaddr
 
 import (
 	"fmt"
@@ -9,11 +10,10 @@ import (
 	"regexp"
 	"strings"
 
-	svchost "github.com/hashicorp/terraform-svchost"
+	"github.com/opentofu/svchost"
 )
 
-// Module is representing a module listed in a Terraform module
-// registry.
+// Module is representing a module listed in an OpenTofu module registry.
 type Module struct {
 	// Package is the registry package that the target module belongs to.
 	// The module installer must translate this into a ModuleSourceRemote
@@ -35,6 +35,12 @@ type Module struct {
 // DefaultModuleRegistryHost is the hostname used for registry-based module
 // source addresses that do not have an explicit hostname.
 const DefaultModuleRegistryHost = svchost.Hostname("registry.opentofu.org")
+
+// TransitionalDefaultModuleRegistryHost is the equivalent to
+// [DefaultModuleRegistryHost] from OpenTofu's predecessor project, which
+// OpenTofu might sometimes need to handle in a special way to support
+// those switching existing configurations to use OpenTofu.
+const TransitionalDefaultModuleRegistryHost = svchost.Hostname("registry.terraform.io")
 
 var moduleRegistryNamePattern = regexp.MustCompile("^[0-9A-Za-z](?:[0-9A-Za-z-_]{0,62}[0-9A-Za-z])?$")
 var moduleRegistryTargetSystemPattern = regexp.MustCompile("^[0-9a-z]{1,64}$")

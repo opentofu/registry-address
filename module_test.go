@@ -1,7 +1,8 @@
+// Copyright (c) The OpenTofu Authors
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
-package tfaddr
+package regaddr
 
 import (
 	"fmt"
@@ -9,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	svchost "github.com/hashicorp/terraform-svchost"
+	"github.com/opentofu/svchost"
 )
 
 func TestParseModuleSource_simple(t *testing.T) {
@@ -249,5 +250,5 @@ func ExampleParseModuleSource() {
 		log.Fatal(err)
 	}
 	fmt.Printf("%#v", mAddr)
-	// Output: tfaddr.Module{Package:tfaddr.ModulePackage{Host:svchost.Hostname("registry.opentofu.org"), Namespace:"hashicorp", Name:"consul", TargetSystem:"aws"}, Subdir:"modules/consul-cluster"}
+	// Output: regaddr.Module{Package:regaddr.ModulePackage{Host:svchost.Hostname("registry.opentofu.org"), Namespace:"hashicorp", Name:"consul", TargetSystem:"aws"}, Subdir:"modules/consul-cluster"}
 }

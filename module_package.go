@@ -10,16 +10,8 @@ import (
 	"github.com/opentofu/svchost"
 )
 
-// A ModulePackage is an extra indirection over a ModulePackage where
-// we use a module registry to translate a more symbolic address (and
-// associated version constraint given out of band) into a physical source
-// location.
-//
-// ModulePackage is distinct from ModulePackage because they have
-// disjoint use-cases: registry package addresses are only used to query a
-// registry in order to find a real module package address. These being
-// distinct is intended to help future maintainers more easily follow the
-// series of steps in the module installer, with the help of the type checker.
+// ModulePackage represents a module package that can be installed using information
+// from an OpenTofu module registry.
 type ModulePackage struct {
 	Host         svchost.Hostname
 	Namespace    string

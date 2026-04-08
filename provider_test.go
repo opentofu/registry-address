@@ -512,11 +512,39 @@ func TestParseProviderPart(t *testing.T) {
 		},
 		`-abc123`: {
 			``,
-			`must contain only letters, digits, and dashes, and may not use leading or trailing dashes`,
+			`must contain only letters, digits, dashes, and underscores, and may not use leading or trailing dashes or underscores`,
 		},
 		`abc123-`: {
 			``,
-			`must contain only letters, digits, and dashes, and may not use leading or trailing dashes`,
+			`must contain only letters, digits, dashes, and underscores, and may not use leading or trailing dashes or underscores`,
+		},
+		`foo_bar`: {
+			`foo_bar`,
+			``,
+		},
+		`foo_baar`: {
+			`foo_baar`,
+			``,
+		},
+		`Foo_Bar`: {
+			`foo_bar`,
+			``,
+		},
+		`test_123`: {
+			`test_123`,
+			``,
+		},
+		`_abc123`: {
+			``,
+			`underscores may not be used as a prefix or suffix`,
+		},
+		`abc123_`: {
+			``,
+			`underscores may not be used as a prefix or suffix`,
+		},
+		`foo__bar`: {
+			``,
+			`cannot use multiple consecutive underscores`,
 		},
 		``: {
 			``,

@@ -466,12 +466,50 @@ func ParseProviderPart(given string) (string, error) {
 		return "", fmt.Errorf("cannot use multiple consecutive dashes")
 	}
 
-	result, err := idna.Lookup.ToUnicode(given)
-	if err != nil {
-		return "", fmt.Errorf("must contain only letters, digits, and dashes, and may not use leading or trailing dashes")
+	// Similarly, reject consecutive underscores
+	if strings.Contains(given, "__") {
+		return "", fmt.Errorf("cannot use multiple consecutive underscores")
 	}
 
-	return result, nil
+	// Check for leading or trailing underscores
+	if strings.HasPrefix(given, "_") || strings.HasSuffix(given, "_") {
+		return "", fmt.Errorf("underscores may not be used as a prefix or suffix")
+	}
+
+	// Process the string in segments split by underscores, since IDNA doesn't allow underscores.
+	// Each segment between underscores is validated through IDNA, while underscores are preserved.
+	var segment strings.Builder
+	var result strings.Builder
+
+	flush := func() error {
+		if segment.Len() == 0 {
+			return nil
+		}
+		normalized, err := idna.Lookup.ToUnicode(segment.String())
+		if err != nil {
+			return fmt.Errorf("must contain only letters, digits, dashes, and underscores, and may not use leading or trailing dashes or underscores")
+		}
+		result.WriteString(normalized)
+		segment.Reset()
+		return nil
+	}
+
+	for _, r := range given {
+		if r == '_' {
+			if err := flush(); err != nil {
+				return "", err
+			}
+			result.WriteRune('_')
+		} else {
+			segment.WriteRune(r)
+		}
+	}
+
+	if err := flush(); err != nil {
+		return "", err
+	}
+
+	return result.String(), nil
 }
 
 // MustParseProviderPart is a wrapper around ParseProviderPart that panics if

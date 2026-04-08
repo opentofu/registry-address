@@ -534,11 +534,11 @@ func TestParseProviderPart(t *testing.T) {
 			`test_123`,
 			``,
 		},
-		`_abc123`: {
+		`_abc12`: {
 			``,
 			`underscores may not be used as a prefix or suffix`,
 		},
-		`abc123_`: {
+		`abc12_`: {
 			``,
 			`underscores may not be used as a prefix or suffix`,
 		},

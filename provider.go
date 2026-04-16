@@ -457,7 +457,7 @@ func ParseProviderPart(given string) (string, error) {
 		return "", fmt.Errorf("dots are not allowed")
 	}
 
-	// We don't allow names containing multiple consecutive dashes, just as
+	// We don't allow names containing multiple consecutive dashes or underscores, just as
 	// a matter of preference: they look weird, confusing, or incorrect.
 	// This also, as a side-effect, prevents the use of the "punycode"
 	// indicator prefix "xn--" that would cause the IDNA library to interpret
@@ -465,10 +465,24 @@ func ParseProviderPart(given string) (string, error) {
 	if strings.Contains(given, "--") {
 		return "", fmt.Errorf("cannot use multiple consecutive dashes")
 	}
+	if strings.Contains(given, "__") {
+		return "", fmt.Errorf("cannot use multiple consecutive underscores")
+	}
 
-	result, err := idna.Lookup.ToUnicode(given)
+	// Similarly, default domain lookup does not allow a dash as a
+	// prefix or suffix, but does allow underscores. We do not.
+	if strings.HasPrefix(given, "_") || strings.HasSuffix(given, "_") {
+		return "", fmt.Errorf("underscores may not be used as a prefix or suffix")
+	}
+
+	unicodeProfile := idna.New(
+		idna.MapForLookup(),
+		idna.BidiRule(),
+		idna.StrictDomainName(false),
+	)
+	result, err := unicodeProfile.ToUnicode(given)
 	if err != nil {
-		return "", fmt.Errorf("must contain only letters, digits, and dashes, and may not use leading or trailing dashes")
+		return "", fmt.Errorf("must contain only letters, digits, dashes, and underscores, and may not use leading or trailing dashes or underscores")
 	}
 
 	return result, nil

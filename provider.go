@@ -7,6 +7,7 @@ package regaddr
 import (
 	"fmt"
 	"strings"
+	"unicode"
 
 	"github.com/opentofu/svchost"
 	"golang.org/x/net/idna"
@@ -485,7 +486,29 @@ func ParseProviderPart(given string) (string, error) {
 		return "", fmt.Errorf("must contain only letters, digits, dashes, and underscores, and may not use leading or trailing dashes or underscores")
 	}
 
+	// we're also implementing a slightly more permissive version of the UseSTD3ASCIIRules:
+	// https://www.unicode.org/reports/tr46/#UseSTD3ASCIIRules
+	// If a given code point is ASCII (i.e. ) then it must be
+	// a lowercase letter (a-z), a digit (0-9), or a hyphen-minus (U+002D),
+	// OR a "low line" (U+005F)
+	// We process the result string after it has been checked by the not-as-strict baseline
+
+	for _, r := range result {
+		if r <= unicode.MaxASCII && !validDomainASCII(r) {
+			return "", fmt.Errorf("must contain only letters, digits, dashes, and underscores, and may not use leading or trailing dashes or underscores")
+		}
+	}
+
 	return result, nil
+}
+
+// validDomainASCII returns true if the provided code point is
+// a lowercase letter (a-z) (U+0061...U+007A),
+// a digit (0-9) (U+0030...U+0039),
+// a hyphen-minus ('-') (U+002D),
+// or a "low line" ('_') (U+005F)
+func validDomainASCII(r rune) bool {
+	return (0x61 <= r && r <= 0x7A) || (0x30 <= r && r <= 0x39) || r == 0x2D || r == 0x5F
 }
 
 // MustParseProviderPart is a wrapper around ParseProviderPart that panics if

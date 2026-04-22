@@ -546,6 +546,51 @@ func TestParseProviderPart(t *testing.T) {
 			``,
 			`cannot use multiple consecutive underscores`,
 		},
+		`foo_-bar`: {
+			``,
+			`cannot use consecutive underscores and dashes`,
+		},
+		`foo-_bar`: {
+			``,
+			`cannot use consecutive underscores and dashes`,
+		},
+		// ASCII punctuation tests
+		`foo|bar`: {
+			``,
+			`must contain only letters, digits, dashes, and underscores, and may not use leading or trailing dashes or underscores`,
+		},
+		`foo&bar`: {
+			``,
+			`must contain only letters, digits, dashes, and underscores, and may not use leading or trailing dashes or underscores`,
+		},
+		`foo:bar`: {
+			``,
+			`must contain only letters, digits, dashes, and underscores, and may not use leading or trailing dashes or underscores`,
+		},
+		`foo~bar`: {
+			``,
+			`must contain only letters, digits, dashes, and underscores, and may not use leading or trailing dashes or underscores`,
+		},
+		`foo^bar`: {
+			``,
+			`must contain only letters, digits, dashes, and underscores, and may not use leading or trailing dashes or underscores`,
+		},
+		`foo,bar`: {
+			``,
+			`must contain only letters, digits, dashes, and underscores, and may not use leading or trailing dashes or underscores`,
+		},
+		`foo'bar`: {
+			``,
+			`must contain only letters, digits, dashes, and underscores, and may not use leading or trailing dashes or underscores`,
+		},
+		`foo"bar`: {
+			``,
+			`must contain only letters, digits, dashes, and underscores, and may not use leading or trailing dashes or underscores`,
+		},
+		`foo bar`: {
+			``,
+			`must contain only letters, digits, dashes, and underscores, and may not use leading or trailing dashes or underscores`,
+		},
 		``: {
 			``,
 			`must have at least one character`,

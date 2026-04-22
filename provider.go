@@ -469,6 +469,9 @@ func ParseProviderPart(given string) (string, error) {
 	if strings.Contains(given, "__") {
 		return "", fmt.Errorf("cannot use multiple consecutive underscores")
 	}
+	if strings.Contains(given, "_-") || strings.Contains(given, "-_") {
+		return "", fmt.Errorf("cannot use consecutive underscores and dashes")
+	}
 
 	// Similarly, default domain lookup does not allow a dash as a
 	// prefix or suffix, but does allow underscores. We do not.
